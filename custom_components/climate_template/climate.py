@@ -178,6 +178,8 @@ class TemplateClimate(TemplateEntity, ClimateEntity, RestoreEntity):
         self._available = True
         self._unit_of_measurement = hass.config.units.temperature_unit
         self._attr_supported_features = 0
+        self._attr_supported_features |= ClimateEntityFeature.TURN_ON
+        self._attr_supported_features |= ClimateEntityFeature.TURN_OFF
 
         self._attr_hvac_modes = config[CONF_MODE_LIST]
         self._attr_fan_modes = config[CONF_FAN_MODE_LIST]
