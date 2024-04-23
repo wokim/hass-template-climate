@@ -36,7 +36,6 @@ from homeassistant.const import (
     PRECISION_TENTHS,
     PRECISION_WHOLE,
     ATTR_TEMPERATURE,
-    ATTR_HUMIDITY,
     CONF_NAME,
     STATE_UNKNOWN,
     STATE_UNAVAILABLE,
@@ -280,7 +279,7 @@ class TemplateClimate(TemplateEntity, ClimateEntity, RestoreEntity):
             if temperature_low := previous_state.attributes.get(ATTR_TARGET_TEMP_LOW):
                 self._attr_target_temperature_low = float(temperature_low)
 
-            if humidity := previous_state.attributes.get(ATTR_HUMIDITY, DEFAULT_HUMIDITY):
+            if humidity := previous_state.attributes.get("humidity", DEFAULT_HUMIDITY):
                 self._target_humidity = float(humidity)
 
             self._current_fan_mode = previous_state.attributes.get(
@@ -418,7 +417,7 @@ class TemplateClimate(TemplateEntity, ClimateEntity, RestoreEntity):
             try:
                 self._target_humidity = float(humidity)
                 self.hass.async_create_task(
-                    self.async_set_humidity(**{ATTR_HUMIDITY: self._target_humidity})
+                    self.async_set_humidity(**{"humidity": self._target_humidity})
                 )
             except ValueError:
                 _LOGGER.error("Could not parse humidity from %s", humidity)
@@ -620,7 +619,7 @@ class TemplateClimate(TemplateEntity, ClimateEntity, RestoreEntity):
         """Set new target humidity."""
         # handle optimistic mode
         if self._target_humidity_template is None:
-            self._target_humidity = kwargs.get(ATTR_HUMIDITY)
+            self._target_humidity = kwargs.get("humidity")
             self.async_write_ha_state()
 
         # set humidity calls can contain a new hvac mode.
@@ -630,7 +629,7 @@ class TemplateClimate(TemplateEntity, ClimateEntity, RestoreEntity):
         if self._set_humidity_script is not None:
             await self._set_humidity_script.async_run(
                 run_variables={
-                    ATTR_HUMIDITY: kwargs.get(ATTR_HUMIDITY),
+                    "humidity": kwargs.get("humidity"),
                     ATTR_HVAC_MODE: kwargs.get(ATTR_HVAC_MODE),
                 },
                 context=self._context,
